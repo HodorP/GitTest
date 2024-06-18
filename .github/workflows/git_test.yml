@@ -28,8 +28,8 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
       - name: First test
-        if: ${{ github.event.inputs.deployment_target == 'first_test' }}
-        run: pytest tests/test_button.py::test_button_exist
+        if: "github.event.inputs.deployment_target == 'first_test'"
+        run: pytest
       - name: Second test
-        if: "github.event.inputs.deployment_target == 'second_test'"
+        if: "github.event.inputs.deployment-target == 'second_test'"
         run: pytest tests/test_button.py::test_like_a_button_exist
