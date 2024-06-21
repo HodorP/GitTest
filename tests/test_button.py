@@ -18,3 +18,7 @@ def test_button_click(driver):
         driver.get("https://www.qa-practice.com/elements/button/simple")
     with allure.step("Click button"):
         assert driver.find_element(By.CSS_SELECTOR, ".btn.btn-primary")
+
+
+def test3():
+    assert 1 == 2

@@ -11,7 +11,7 @@ on:
         options:
           - first_test
           - second_test
-
+          - all
 permissions:
   contents: read
   pages: write
@@ -69,6 +69,9 @@ jobs:
       - name: Second test
         if: "github.event.inputs.deployment-target == 'second_test'"
         run: pytest tests/test_button2.py::test_like_a_button_exist --alluredir=results
+      - name: all
+        if: "github.event.inputs.deployment-target == 'all'"
+        run: pytest --alluredir=results
       - name: Store results
         uses: actions/upload-artifact@v3
         with:
