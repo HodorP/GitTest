@@ -18,9 +18,38 @@ permissions:
   id-token: write
 
 jobs:
+  download-history:
+    name: Download history
+    runs-on: ubuntu-latest
+    steps:
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.9
+      - run: >
+          ARTIFACT_ID=$(curl -L -H "Accept: application/vnd.github+json" 
+          -H "X-GitHub-Api-Version: 2022-11-28"
+          "https://api.github.com/repos/HodorP/GitTest/actions/artifacts?name=results"
+          | python -c "import sys, json; print(json.load(sys.stdin)['artifacts'][0]['id']);")
+          &&
+          curl -L
+          -H "Accept: application/vnd.github+json"
+          -H "Authorization: Bearer ${{ secret.TOKEN }}"
+          -H "X-GitHub-Api-Version: 2022-11-28"
+          https://api.github.com/repos/HodorP/GitTest/actions/artifacts/$ARTIFACT_ID/zip -o artifacts.zip
+      - run: mkdir results && unzip artifacts.zip -d results
+      - name: Store allure history
+        uses: actions/upload-artifact@v3
+        with:
+          name: results
+          path:
+            results
+          retention-days: 1
+
+
   test:
     runs-on: ubuntu-latest
-
+    needs: download-history
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
@@ -32,6 +61,8 @@ jobs:
         run: sudo apt-get install google-chrome-stable
       - name: Install dependencies
         run: pip install -r requirements.txt
+      - name: Download all workflow run artefacts
+        uses: actions/download-artifact@v3
       - name: First test
         if: "github.event.inputs.deployment-target == 'first_test'"
         run: pytest tests/test_button.py::test_button_exist --alluredir=results
