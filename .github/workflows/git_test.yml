@@ -6,7 +6,7 @@ on:
       deployment-target:
         description: 'Choose target'
         required: true
-        default:
+        default: second_test
         type: choice
         options:
           - first_test
@@ -32,4 +32,4 @@ jobs:
         run: pytest tests/test_button.py::test_button_exist
       - name: Second test
         if: "github.event.inputs.deployment-target == 'second_test'"
-        run: pytest tests/test_button.py::test_like_a_button_exist
+        run: pytest tests/test_button2.py::test_like_a_button_exist

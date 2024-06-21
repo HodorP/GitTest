@@ -1,22 +1,20 @@
-from selenium import webdriver
 from selenium.webdriver.common.by import By
-from selenium.webdriver.chrome.options import Options
-import pytest
+import allure
 
 
-@pytest.fixture()
-def driver(request):
-    options = Options()
-    options.add_argument('--headless')
-    driver = webdriver.Chrome(options=options)
-    return driver
-
-
+@allure.feature("Simple Button")
+@allure.story("Exist")
 def test_button_exist(driver):
-    driver.get("https://www.qa-practice.com/elements/button/simple")
-    assert driver.find_element(By.CSS_SELECTOR, ".btn.btn-primary")
+    with allure.step("Open simple button page"):
+        driver.get("https://www.qa-practice.com/elements/button/simple")
+    with allure.step("Check button"):
+        assert driver.find_element(By.CSS_SELECTOR, ".btn.btn-primary")
 
 
-def test_like_a_button_exist(driver):
-    driver.get("https://www.qa-practice.com/elements/button/like_a_button#")
-    assert driver.find_element(By.CSS_SELECTOR, ".a-button")
+@allure.feature("Simple Button")
+@allure.story("Click")
+def test_button_click(driver):
+    with allure.step("Open simple button page"):
+        driver.get("https://www.qa-practice.com/elements/button/simple")
+    with allure.step("Click button"):
+        assert driver.find_element(By.CSS_SELECTOR, ".btn.btn-primary")
