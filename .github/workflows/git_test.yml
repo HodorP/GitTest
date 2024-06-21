@@ -29,7 +29,7 @@ jobs:
         run: pip install -r requirements.txt
       - name: First test
         if: "github.event.inputs.deployment-target == 'first_test'"
-        run: pytest tests/test_button.py::test_button_exist
+        run: pytest tests/test_button.py::test_button_exist --alluredir=results
       - name: Second test
         if: "github.event.inputs.deployment-target == 'second_test'"
-        run: pytest tests/test_button2.py::test_like_a_button_exist
+        run: pytest tests/test_button2.py::test_like_a_button_exist --alluredir=results
