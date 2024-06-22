@@ -27,7 +27,7 @@ jobs:
         with:
           python-version: 3.9
       - run: >
-          ARTIFACT_ID=$(curl -L -H "Accept: application/vnd.github+json" -H "X-GitHub-Api-Version: 2022-11-28" "https://api.github.com/repos/HodorP/GitTest/actions/artifacts?name=results" | python3 -c "import sys, json; print(json.load(sys.stdin)['artifacts'][0]['id']);") 
+          ARTIFACT_ID=$(curl -L -H "Accept: application/vnd.github+json" -H "X-GitHub-Api-Version: 2022-11-28" "https://api.github.com/repos/HodorP/GitTest/actions/artifacts?name=allure-results" | python3 -c "import sys, json; print(json.load(sys.stdin)['artifacts'][0]['id']);") 
           &&
           curl -L -H "Accept: application/vnd.github+json" -H "Authorization: Bearer ${{ secrets.TOKEN }}" -H "X-GitHub-Api-Version: 2022-11-28" "https://api.github.com/repos/HodorP/GitTest/actions/artifacts/$ARTIFACT_ID/zip" -o artifacts.zip
           &&
@@ -35,15 +35,15 @@ jobs:
           &&
           curl -L -H "Accept: application/vnd.github+json" -H "Authorization: Bearer ${{ secrets.TOKEN }}" -H "X-GitHub-Api-Version: 2022-11-28" "https://api.github.com/repos/HodorP/GitTest/actions/artifacts/$REPORT_ID/zip" -o pages.zip
 
-      - run: mkdir results && unzip artifacts.zip -d results
+      - run: mkdir allure-results && unzip artifacts.zip -d allure-results
       - run: mkdir old_pages pages_history && unzip pages.zip -d old_pages && tar -xvf old_pages/artifact.tar -C pages_history
-      - run: cp pages_history/history/* results && cp -r pages_history/history result
+      - run: cp pages_history/history/* allure-results && cp -r pages_history/history result
       - name: Store allure history
         uses: actions/upload-artifact@v3
         with:
-          name: results
+          name: allure-results
           path:
-            results
+            allure-results
           retention-days: 1
 
 
@@ -65,22 +65,22 @@ jobs:
         uses: actions/download-artifact@v3
       - name: First test
         if: "github.event.inputs.deployment-target == 'first_test'"
-        run: pytest tests/test_button.py::test_button_exist --alluredir=results
+        run: pytest tests/test_button.py::test_button_exist --alluredir=allure-results
         continue-on-error: true
       - name: Second test
         if: "github.event.inputs.deployment-target == 'second_test'"
-        run: pytest tests/test_button2.py::test_like_a_button_exist --alluredir=results
+        run: pytest tests/test_button2.py::test_like_a_button_exist --alluredir=allure-results
         continue-on-error: true
       - name: all
         if: "github.event.inputs.deployment-target == 'all'"
-        run: pytest --alluredir=results
+        run: pytest --alluredir=allure-results
         continue-on-error: true
-      - name: Store results
+      - name: Store allure-results
         uses: actions/upload-artifact@v3
         with:
-          name: results
+          name: allure-results
           path:
-            results
+            allure-results
           retention-days: 1
 
   generate-report:
@@ -95,7 +95,7 @@ jobs:
       - run: sudo wget https://github.com/allure-framework/allure2/releases/download/2.29.0/allure-2.29.0.tgz && sudo tar -zxvf allure-2.29.0.tgz -C /opt/ && sudo ln -s /opt/allure-2.29.0/bin/allure /usr/bin/allure
       - name: Download all workflow run artefacts
         uses: actions/download-artifact@v3
-      - run: allure generate -c results -o _site
+      - run: allure generate -c allure-results -o _site
       - name: Store generations report
         uses: actions/upload-artifact@v3
         with:
