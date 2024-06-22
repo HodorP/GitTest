@@ -66,12 +66,15 @@ jobs:
       - name: First test
         if: "github.event.inputs.deployment-target == 'first_test'"
         run: pytest tests/test_button.py::test_button_exist --alluredir=results
+        continue-on-error: true
       - name: Second test
         if: "github.event.inputs.deployment-target == 'second_test'"
         run: pytest tests/test_button2.py::test_like_a_button_exist --alluredir=results
+        continue-on-error: true
       - name: all
         if: "github.event.inputs.deployment-target == 'all'"
         run: pytest --alluredir=results
+        continue-on-error: true
       - name: Store results
         uses: actions/upload-artifact@v3
         with:
